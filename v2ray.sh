@@ -3,9 +3,6 @@ yum -y install docker && systemctl start docker && mkdir -p /etc/v2ray &&
 (
 cat <<EOF
 {
-  "log": {
-    "loglevel": "error"
-  },
   "inbounds": [
     {
       "port": 80,
@@ -19,35 +16,52 @@ cat <<EOF
         ]
       },
       "streamSettings": {
-        "network":"ws"
+        "network": "ws",
+        "security": "none",
+        "wsSettings": {
+          "path": "/v2",
+          "headers": {}
+        }
+      },
+      "tag": "",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
       }
     }
   ],
   "outbounds": [
     {
-      "tag": "direct",
       "protocol": "freedom",
       "settings": {}
     },
     {
-      "tag": "blocked",
       "protocol": "blackhole",
-      "settings": {}
+      "settings": {},
+      "tag": "blocked"
     }
   ],
   "routing": {
-    "domainStrategy": "AsIs",
     "rules": [
       {
-        "type": "field",
         "ip": [
           "geoip:private"
         ],
-        "outboundTag": "blocked"
+        "outboundTag": "blocked",
+        "type": "field"
+      },
+      {
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ],
+        "type": "field"
       }
     ]
-  },
-  "dns": {}
+  }
 }
 EOF
 ) > /etc/v2ray/config.json 
