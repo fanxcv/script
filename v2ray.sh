@@ -44,4 +44,4 @@ cat <<EOF
 EOF
 ) > /etc/v2ray/config.json 
 
-docker run -d --name v2ray -v /etc/v2ray:/etc/v2ray --net=host --restart=always --privileged v2ray/official v2ray -config=/etc/v2ray/config.json
+docker run -d --name v2ray -v /etc/v2ray:/etc/v2ray -p 80:80/tcp --restart=always --privileged v2ray/official v2ray -config=/etc/v2ray/config.json
