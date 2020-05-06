@@ -21,52 +21,35 @@ cat <<EOF
       "streamSettings": {
         "network":"ws"
       }
-    },
-    {
-      "tag": "tg-in",
-      "port": 5432,
-      "protocol": "mtproto",
-      "settings": {
-        "users": [
-          {
-            "secret": "ee07dda1deb56c761dc7116eb3ae8716"
-          }
-        ]
-      }
     }
   ],
   "outbounds": [
     {
+      "tag": "direct",
       "protocol": "freedom",
       "settings": {}
     },
     {
-      "tag": "tg-out",
-      "protocol": "mtproto",
+      "tag": "blocked",
+      "protocol": "blackhole",
       "settings": {}
     }
   ],
   "routing": {
+    "domainStrategy": "AsIs",
     "rules": [
       {
         "type": "field",
-        "inboundTag": [
-          "tg-in"
+        "ip": [
+          "geoip:private"
         ],
-        "outboundTag": "tg-out"
+        "outboundTag": "blocked"
       }
     ]
   },
-  "dns": {
-    "hosts": {
-    },
-    "servers": [
-      "8.8.8.8",
-      "1.1.1.1"
-    ]
-  }
+  "dns": {}
 }
 EOF
 ) > /etc/v2ray/config.json 
 
-docker run -d --name v2ray -v /etc/v2ray:/etc/v2ray -p 80:80/tcp -p 5432:5432/tcp v2ray/official v2ray -config=/etc/v2ray/config.json
+docker run -d --name v2ray -v /etc/v2ray:/etc/v2ray --net=host --restart=always --privileged v2ray/official v2ray -config=/etc/v2ray/config.json
