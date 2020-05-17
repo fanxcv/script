@@ -53,7 +53,7 @@ cat <<EOF
 server {
     listen 80;
     server_name $1;
-    rewrite ^(.*) https://$server_name$1 permanent;
+    rewrite ^(.*) https://\$server_name\$1 permanent;
 }
 
 server {
@@ -69,16 +69,16 @@ server {
     index index.html index.htm index.nginx-debian.html;
     server_name $1;
     location / {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
 
     location /v2 {
         proxy_redirect off;
         proxy_pass http://172.88.8.8:80;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host $http_host;
+        proxy_set_header Host \$http_host;
         proxy_read_timeout 300s;
     }
 }
