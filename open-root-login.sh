@@ -9,3 +9,7 @@ systemctl stop oracle-cloud-agent
 systemctl disable oracle-cloud-agent
 systemctl stop oracle-cloud-agent-updater
 systemctl disable oracle-cloud-agent-updater
+
+#安装bbr plus
+grub2-mkconfig -o /boot/grub2/grub.cfg
+wget "https://github.com/cx9208/bbrplus/raw/master/ok_bbrplus_centos.sh" && chmod +x ok_bbrplus_centos.sh && ./ok_bbrplus_centos.sh
