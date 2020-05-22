@@ -1,5 +1,8 @@
 #!/bin/bash
-yum -y install docker && systemctl start docker && mkdir -p /etc/v2ray && 
+yum -y install docker \
+    && systemctl start docker \
+    && systemctl enable docker \
+    && mkdir -p /etc/v2ray && 
 (
 cat <<EOF
 {
