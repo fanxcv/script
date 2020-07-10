@@ -62,8 +62,7 @@ server {
 
 server {
     listen 443 ssl;
-    
-    ssl on;                                                         
+                                                             
     ssl_certificate       /etc/nginx/conf.d/ssl.pem;  
     ssl_certificate_key   /etc/nginx/conf.d/ssl.key;
     ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;                    
@@ -72,9 +71,6 @@ server {
     root /var/www/html;
     index index.html index.htm index.nginx-debian.html;
     server_name $1;
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
 
     location /v2 {
         proxy_redirect off;
@@ -84,6 +80,10 @@ server {
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
         proxy_read_timeout 300s;
+    }
+    
+    location / {
+        try_files \$uri \$uri/ =404;
     }
 }
 EOF
