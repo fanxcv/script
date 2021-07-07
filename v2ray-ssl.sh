@@ -80,5 +80,5 @@ EOF
 
 docker network create --subnet 172.88.0.0/16 fan
 
-docker run -d --name v2ray -v /etc/xray:/etc/xray --net=fan --ip=172.88.8.8 --restart=always --privileged teddysun/xray
+docker run -d --name xray -v /etc/xray:/etc/xray --net=fan --ip=172.88.8.8 --restart=always --privileged teddysun/xray
 docker run -d --name nginx -p 80:80/tcp -p 443:443/tcp --net=fan --restart=always --privileged -v /etc/nginx/:/etc/nginx/conf.d/ nginx:alpine
