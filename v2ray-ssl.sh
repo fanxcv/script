@@ -31,7 +31,7 @@ cat <<EOF
   "outbounds": [{
     "protocol": "freedom",
     "settings": {}
-  }]
+  }],
   "dns": {
     "servers": [
       "8.8.8.8",
