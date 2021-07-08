@@ -1,10 +1,7 @@
 #!/bin/bash
-yum -y install docker \
-  && systemctl start docker \
-  && systemctl enable docker \
-  && mkdir -p /etc/xray \
-  && mkdir -p /etc/nginx \
-  && (
+mkdir -p /etc/xray \
+&& mkdir -p /etc/nginx \
+&& (
 cat <<EOF
 {
   "log": {
@@ -45,8 +42,26 @@ EOF
 cat <<EOF
 server {
     listen 80;
-    server_name $1;
-    rewrite ^(.*) https://\$server_name\$1 permanent;
+    server_name 127.0.0.1;
+
+    location /v2 {
+        proxy_redirect off;
+        proxy_pass http://172.88.8.8:80;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+        proxy_read_timeout 300s;
+    }
+
+    location / {
+        #try_files $uri $uri/ =404;
+        proxy_pass http://172.88.8.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
 }
 
 server {
@@ -59,20 +74,22 @@ server {
 
     root /var/www/html;
     index index.html index.htm index.nginx-debian.html;
-    server_name $1;
 
-    location /v2 {
+    server_name 127.0.0.1;
+
+    location @v2 {
+        rewrite .* /v2 break;
         proxy_redirect off;
         proxy_pass http://172.88.8.8:80;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$http_host;
+        proxy_set_header Host $http_host;
         proxy_read_timeout 300s;
     }
-    
+
     location / {
-        try_files \$uri \$uri/ =404;
+        try_files $uri $uri/ @v2;
     }
 }
 EOF
