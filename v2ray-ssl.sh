@@ -64,22 +64,22 @@ server {
 }
 
 server {
-    listen 443 ssl;
+    listen      443 ssl http2 default_server;
+    server_name 127.0.0.1;
                                                              
     ssl_certificate       /etc/nginx/conf.d/ssl.pem;  
     ssl_certificate_key   /etc/nginx/conf.d/ssl.key;
     ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;                    
     ssl_ciphers           HIGH:!aNULL:!MD5;
+    ssl_session_timeout   60m;
+    ssl_session_tickets   on;
 
     root /var/www/html;
     index index.html index.htm index.nginx-debian.html;
-
-    server_name 127.0.0.1;
-
-    location @v2 {
-        rewrite .* /v2 break;
+    
+    location /v2 {
         proxy_redirect off;
-        proxy_pass http://172.88.8.8:80;
+        proxy_pass http://172.88.8.8;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -88,7 +88,7 @@ server {
     }
 
     location / {
-        try_files \$uri \$uri/ @v2;
+        try_files \$uri \$uri/ =404;
     }
 }
 EOF
