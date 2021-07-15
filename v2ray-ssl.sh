@@ -18,10 +18,8 @@ cat <<EOF
     },
     "streamSettings": {
       "network": "ws",
-      "security": "none",
       "wsSettings": {
-        "path": "/v2",
-        "headers": {}
+        "path": "/v2"
       }
     }
   }],
