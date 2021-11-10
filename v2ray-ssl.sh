@@ -7,6 +7,18 @@ cat <<EOF
   "log": {
     "loglevel": "error"
   },
+  "dns": {
+    "servers": ["8.8.8.8", "8.8.4.4", "1.1.1.1"]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 4,
+        "connIdle": 86400,
+        "bufferSize": 8192
+      }
+    }
+  },
   "inbounds": [{
     "port": 80,
     "protocol": "vmess",
@@ -41,13 +53,7 @@ cat <<EOF
   "outbounds": [{
     "protocol": "freedom",
     "settings": {}
-  }],
-  "dns": {
-    "servers": [
-      "8.8.8.8",
-      "8.8.4.4"
-    ]
-  }
+  }]
 }
 EOF
 ) > /etc/xray/config.json &&
