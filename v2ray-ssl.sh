@@ -10,15 +10,6 @@ cat <<EOF
   "dns": {
     "servers": ["8.8.8.8", "8.8.4.4", "1.1.1.1"]
   },
-  "policy": {
-    "levels": {
-      "0": {
-        "handshake": 4,
-        "connIdle": 86400,
-        "bufferSize": 8192
-      }
-    }
-  },
   "inbounds": [{
     "port": 80,
     "protocol": "vmess",
@@ -49,6 +40,40 @@ cat <<EOF
         "path": "/vl"
       }
     }
+  }, {
+    "port": 86,
+    "protocol": "vless",
+    "settings": {
+      "decryption": "none",
+      "clients": [{
+        "id": "9d38ee36-e96d-11e8-9f32-f2801f1b9fd9"
+      }]
+    },
+    "streamSettings": {
+      "network": "http",
+      "security": "none",
+      "httpSettings": {
+        "host": ["shoutingtoutiao3.10010.com"],
+        "path": "/h2"
+      }
+    }
+  }, {
+    "port": 88,
+    "protocol": "vless",
+    "settings": {
+      "decryption": "none",
+      "clients": [{
+        "id": "9d38ee36-e96d-11e8-9f32-f2801f1b9fd9"
+      }]
+    },
+    "streamSettings": {
+      "network": "grpc",
+      "security": "none",
+      "grpcSettings": {
+        "serviceName": "fan",
+        "multiMode": true
+      }
+    }
   }],
   "outbounds": [{
     "protocol": "freedom",
@@ -60,7 +85,7 @@ EOF
 (
 cat <<EOF
 server {
-    listen 80;
+    listen 80 default_server;
     server_name 127.0.0.1;
 
     rewrite ^(.*)\$ https://\$host\$1 permanent;
@@ -94,8 +119,8 @@ server {
         proxy_set_header Connection "upgrade";
         proxy_set_header Upgrade    \$http_upgrade;
         proxy_set_header Host       \$host;
-        proxy_read_timeout 3600s;
         proxy_http_version 1.1;
+        proxy_read_timeout 1d;
     }
 
     location /vl {
@@ -104,8 +129,16 @@ server {
         proxy_set_header Connection "upgrade";
         proxy_set_header Upgrade    \$http_upgrade;
         proxy_set_header Host       \$host;
-        proxy_read_timeout 3600s;
         proxy_http_version 1.1;
+        proxy_read_timeout 1d;
+    }
+    
+   location /fan {
+        grpc_pass grpc://172.88.8.8:88;
+        client_max_body_size 0;
+        grpc_buffer_size 128M;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
     }
 
     location / {
