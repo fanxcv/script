@@ -151,6 +151,13 @@ EOF
 wget -O /etc/nginx/www/index.html https://raw.githubusercontent.com/5iux/5iux.github.io/master/ip/index.html
 wget -O /etc/nginx/www/logo.png https://raw.githubusercontent.com/5iux/5iux.github.io/master/ip/logo.png
 
+# USER=5iux
+# REPO=5iux.github.io
+# VERSION=`wget -qO- -t1 -T2 "https://api.github.com/repos/$USER/$REPO/releases/latest" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'`
+# wget -O /etc/nginx/www/$VERSION.tar.gz https://github.com/$USER/$REPO/archive/refs/tags/$VERSION.tar.gz
+# tar -xvf /etc/nginx/www/$VERSION.tar.gz -C /etc/nginx/www/ 
+# rm -rf /etc/nginx/www/$VERSION.tar.gz
+
 docker network create --subnet 172.88.0.0/16 fan
 
 docker rm -f xray nginx
