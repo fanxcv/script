@@ -115,7 +115,7 @@ server {
 
     location /v2 {
         proxy_redirect off;
-        proxy_pass http://172.88.8.8;
+        proxy_pass http://xray;
         proxy_set_header Connection "upgrade";
         proxy_set_header Upgrade    \$http_upgrade;
         proxy_set_header Host       \$host;
@@ -125,7 +125,7 @@ server {
 
     location /vl {
         proxy_redirect off;
-        proxy_pass http://172.88.8.8:82;
+        proxy_pass http://xray:82;
         proxy_set_header Connection "upgrade";
         proxy_set_header Upgrade    \$http_upgrade;
         proxy_set_header Host       \$host;
@@ -134,7 +134,7 @@ server {
     }
     
    location /fan {
-        grpc_pass grpc://172.88.8.8:88;
+        grpc_pass grpc://xray:88;
         client_max_body_size 0;
         grpc_buffer_size 128M;
         grpc_read_timeout 1d;
@@ -161,5 +161,5 @@ wget -O /etc/nginx/www/logo.png https://raw.githubusercontent.com/5iux/5iux.gith
 docker network create --subnet 172.88.0.0/16 fan
 
 docker rm -f xray nginx
-docker run -d --name xray -v /etc/xray:/etc/xray -e xray.vmess.aead.forced=false --net=fan --ip=172.88.8.8 --restart=always --privileged teddysun/xray
+docker run -d --name xray -v /etc/xray:/etc/xray -e xray.vmess.aead.forced=false --net=fan --restart=always --privileged teddysun/xray
 docker run -d --name nginx -p 80:80/tcp -p 443:443/tcp --net=fan --restart=always --privileged -v /etc/nginx/:/etc/nginx/conf.d/ -v /etc/nginx/www/:/var/www/html/ nginx:alpine
