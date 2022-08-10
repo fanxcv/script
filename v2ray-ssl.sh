@@ -26,6 +26,23 @@ cat <<EOF
       }
     }
   }, {
+    "port": 81,
+    "protocol": "vmess",
+    "settings": {
+      "clients": [{
+        "id": "9d38ee36-e96d-11e8-9f32-f2801f1b9fd9",
+        "alterId": 32
+      }]
+    },
+    "streamSettings": {
+      "network": "grpc",
+      "security": "none",
+      "grpcSettings": {
+        "serviceName": "v2g",
+        "multiMode": true
+      }
+    }
+  }, {
     "port": 82,
     "protocol": "vless",
     "settings": {
@@ -41,24 +58,7 @@ cat <<EOF
       }
     }
   }, {
-    "port": 86,
-    "protocol": "vless",
-    "settings": {
-      "decryption": "none",
-      "clients": [{
-        "id": "9d38ee36-e96d-11e8-9f32-f2801f1b9fd9"
-      }]
-    },
-    "streamSettings": {
-      "network": "http",
-      "security": "none",
-      "httpSettings": {
-        "host": ["shoutingtoutiao3.10010.com"],
-        "path": "/h2"
-      }
-    }
-  }, {
-    "port": 88,
+    "port": 83,
     "protocol": "vless",
     "settings": {
       "decryption": "none",
@@ -89,14 +89,6 @@ server {
     server_name 127.0.0.1;
 
     rewrite ^(.*)\$ https://\$host\$1 permanent;
-
-    #location / {
-    #    proxy_pass http://172.88.8.1;
-    #    proxy_set_header Host \$host;
-    #    proxy_set_header X-Real-IP \$remote_addr;
-    #    proxy_set_header REMOTE-HOST \$remote_addr;
-    #    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    #}
 }
 
 server {
@@ -122,6 +114,14 @@ server {
         proxy_http_version 1.1;
         proxy_read_timeout 1d;
     }
+    
+   location /v2g {
+        grpc_pass grpc://xray:81;
+        client_max_body_size 0;
+        grpc_buffer_size 128M;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+    }
 
     location /vl {
         proxy_redirect off;
@@ -134,7 +134,7 @@ server {
     }
     
    location /fan {
-        grpc_pass grpc://xray:88;
+        grpc_pass grpc://xray:83;
         client_max_body_size 0;
         grpc_buffer_size 128M;
         grpc_read_timeout 1d;
