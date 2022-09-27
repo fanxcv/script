@@ -1,4 +1,7 @@
 #!/bin/bash
+docker pull nginx:alpine
+docker pull teddysun/xray
+
 mkdir -p /etc/xray \
 && mkdir -p /etc/nginx/www \
 && (
